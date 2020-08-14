@@ -2,6 +2,7 @@ package com.github.kkotowiczz.ticketdiscountmanager.salesquarter;
 
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -26,10 +27,16 @@ public class SalesQuarterService {
     salesQuarterRepository.save(salesQuarter);
   }
 
+  public Object getTicketsByWeek(LocalDate date) {
+    var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(date.getMonth().firstMonthOfQuarter().toString());
+    var numberOfWeeks = countNumberOfWeeks(date);
 
-  private long countNumberOfWeeks(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
-    var firstMonthOfCurrentQuarter = salesQuarterCreatorDTO.getTimestamp().getMonth().firstMonthOfQuarter().getValue();
-    var year = salesQuarterCreatorDTO.getTimestamp().getYear();
+    return null;
+  }
+
+  private long countNumberOfWeeks(LocalDate date) {
+    var firstMonthOfCurrentQuarter = date.getMonth().firstMonthOfQuarter().getValue();
+    var year = date.getYear();
     var firstDayOfQuarter = LocalDate.of(year, firstMonthOfCurrentQuarter, 1);
     var lastDayOfQuarter = firstDayOfQuarter.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
     return ChronoUnit.WEEKS.between(firstDayOfQuarter, lastDayOfQuarter);
