@@ -18,7 +18,7 @@ public class SalesQuarterService {
     this.salesQuarterRepository = salesQuarterRepository;
   }
 
-  public void createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
+  void createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(salesQuarterCreatorDTO.getTimestamp().getMonth().firstMonthOfQuarter().toString());
     var optional = salesQuarterRepository.findById(quarter);
     if(optional.isPresent()) {
@@ -30,12 +30,11 @@ public class SalesQuarterService {
     salesQuarterRepository.save(salesQuarter);
   }
 
-  public Map<String, Long> getTicketsByWeek(LocalDate date) {
+  Map<String, Long> getTicketsByWeek(LocalDate date) {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(date.getMonth().firstMonthOfQuarter().toString());
     var numberOfWeeks = countNumberOfWeeks(date);
     var salesQuarter = salesQuarterRepository.findById(quarter);
     return divideNumberOfTicketsByWeeks(numberOfWeeks, salesQuarter.get().getNumberOfTickets());
-
   }
 
   private long countNumberOfWeeks(LocalDate date) {
@@ -48,7 +47,10 @@ public class SalesQuarterService {
 
   private Map<String, Long> divideNumberOfTicketsByWeeks(Long numberOfWeeks, Long ticketsQuantity) {
     if(ticketsQuantity == 0) throw new IllegalArgumentException("Tickets Quantity must be more than 0");
+
     var equalNumberOfTickets = ticketsQuantity / numberOfWeeks;
+    var restOfTickets = ticketsQuantity % numberOfWeeks;
+
     var ticketsByWeekNumber =  new TreeMap<String, Long>((weekOne, weekTwo) -> {
       var numberOne = Integer.parseInt(weekOne.replaceAll("\\D+",""));
       var numberTwo = Integer.parseInt(weekTwo.replaceAll("\\D+",""));
@@ -58,11 +60,26 @@ public class SalesQuarterService {
     for(int i = 1; i <= numberOfWeeks; i++) {
       ticketsByWeekNumber.put("week" + i, equalNumberOfTickets);
     }
-    var restOfTickets = ticketsQuantity % numberOfWeeks;
+
     for(int i = 1; i <= restOfTickets; i++) {
       ticketsByWeekNumber.replace("week" + i, ticketsByWeekNumber.get("week" + i) + 1);
     }
 
     return ticketsByWeekNumber;
+  }
+
+  void adjustTicketAmount(LocalDate date, Long amount) {
+    var quarterOptional = salesQuarterRepository.findById(SalesQuarter.FIRST_MONTH_OF_QUARTER.get(date.getMonth().firstMonthOfQuarter().toString()));
+    if(quarterOptional.isPresent()) {
+      var quarter = quarterOptional.get();
+
+      if(quarter.getNumberOfTickets() + amount > 0) {
+        quarter.setNumberOfTickets(quarter.getNumberOfTickets() + amount);
+      } else {
+       quarter.setNumberOfTickets(0L);
+      }
+
+      salesQuarterRepository.save(quarter);
+    }
   }
 }

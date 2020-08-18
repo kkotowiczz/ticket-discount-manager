@@ -26,4 +26,11 @@ public class SalesQuarterController {
   public ResponseEntity<?> getSalesQuarter(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     return ResponseEntity.ok(service.getTicketsByWeek(date));
   }
+
+  @PutMapping("/")
+  public ResponseEntity<?> adjustNumberOfTickets(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                 @RequestParam Long amount) {
+    service.adjustTicketAmount(date, amount);
+    return ResponseEntity.ok("Quarter has been edited");
+  }
 }
