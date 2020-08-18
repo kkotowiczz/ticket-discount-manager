@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class SalesQuarterCreatorDTO {
   private Long numberOfTickets;
-  private final LocalDate timestamp = LocalDate.of(2020, 12, 11);
+  private final LocalDate timestamp = LocalDate.now();
 
   public SalesQuarterCreatorDTO() {};
 

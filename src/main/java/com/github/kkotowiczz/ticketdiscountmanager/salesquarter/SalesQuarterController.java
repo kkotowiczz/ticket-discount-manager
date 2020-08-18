@@ -23,9 +23,7 @@ public class SalesQuarterController {
   }
 
   @GetMapping("/")
-  public ResponseEntity<?> getSalesQuarter(@RequestParam(value = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-    // TODO implement
-    service.getTicketsByWeek(date);
-    return ResponseEntity.ok("ok");
+  public ResponseEntity<?> getSalesQuarter(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    return ResponseEntity.ok(service.getTicketsByWeek(date));
   }
 }

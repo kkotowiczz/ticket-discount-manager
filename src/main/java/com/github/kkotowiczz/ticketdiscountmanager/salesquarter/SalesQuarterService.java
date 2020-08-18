@@ -6,6 +6,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 @Service
 public class SalesQuarterService {
@@ -27,11 +30,12 @@ public class SalesQuarterService {
     salesQuarterRepository.save(salesQuarter);
   }
 
-  public Object getTicketsByWeek(LocalDate date) {
+  public Map<String, Long> getTicketsByWeek(LocalDate date) {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(date.getMonth().firstMonthOfQuarter().toString());
     var numberOfWeeks = countNumberOfWeeks(date);
+    var salesQuarter = salesQuarterRepository.findById(quarter);
+    return divideNumberOfTicketsByWeeks(numberOfWeeks, salesQuarter.get().getNumberOfTickets());
 
-    return null;
   }
 
   private long countNumberOfWeeks(LocalDate date) {
@@ -40,5 +44,25 @@ public class SalesQuarterService {
     var firstDayOfQuarter = LocalDate.of(year, firstMonthOfCurrentQuarter, 1);
     var lastDayOfQuarter = firstDayOfQuarter.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
     return ChronoUnit.WEEKS.between(firstDayOfQuarter, lastDayOfQuarter);
+  }
+
+  private Map<String, Long> divideNumberOfTicketsByWeeks(Long numberOfWeeks, Long ticketsQuantity) {
+    if(ticketsQuantity == 0) throw new IllegalArgumentException("Tickets Quantity must be more than 0");
+    var equalNumberOfTickets = ticketsQuantity / numberOfWeeks;
+    var ticketsByWeekNumber =  new TreeMap<String, Long>((weekOne, weekTwo) -> {
+      var numberOne = Integer.parseInt(weekOne.replaceAll("\\D+",""));
+      var numberTwo = Integer.parseInt(weekTwo.replaceAll("\\D+",""));
+      return numberOne - numberTwo;
+    });
+
+    for(int i = 1; i <= numberOfWeeks; i++) {
+      ticketsByWeekNumber.put("week" + i, equalNumberOfTickets);
+    }
+    var restOfTickets = ticketsQuantity % numberOfWeeks;
+    for(int i = 1; i <= restOfTickets; i++) {
+      ticketsByWeekNumber.replace("week" + i, ticketsByWeekNumber.get("week" + i) + 1);
+    }
+
+    return ticketsByWeekNumber;
   }
 }
