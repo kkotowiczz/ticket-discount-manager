@@ -37,7 +37,7 @@ public class SalesQuarterService {
     return divideNumberOfTicketsByWeeks(numberOfWeeks, salesQuarter.get().getNumberOfTickets());
   }
 
-  private long countNumberOfWeeks(LocalDate date) {
+  long countNumberOfWeeks(LocalDate date) {
     var firstMonthOfCurrentQuarter = date.getMonth().firstMonthOfQuarter().getValue();
     var year = date.getYear();
     var firstDayOfQuarter = LocalDate.of(year, firstMonthOfCurrentQuarter, 1);

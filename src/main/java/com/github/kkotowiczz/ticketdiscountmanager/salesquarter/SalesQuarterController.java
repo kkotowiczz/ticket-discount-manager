@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.Map;
 
 
 @RestController("/discount-tickets")
@@ -17,18 +18,18 @@ public class SalesQuarterController {
   }
 
   @PostMapping("/")
-  public ResponseEntity<?> createSaleQuarter(@RequestBody SalesQuarterCreatorDTO dto) {
+  public ResponseEntity<String> createSaleQuarter(@RequestBody SalesQuarterCreatorDTO dto) {
     service.createSalesQuarter(dto);
     return ResponseEntity.created(URI.create(dto.getTimestamp().toString())).build();
   }
 
   @GetMapping("/")
-  public ResponseEntity<?> getSalesQuarter(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+  public ResponseEntity<Map<String, Long>> getSalesQuarter(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     return ResponseEntity.ok(service.getTicketsByWeek(date));
   }
 
   @PutMapping("/")
-  public ResponseEntity<?> adjustNumberOfTickets(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+  public ResponseEntity<String> adjustNumberOfTickets(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                                  @RequestParam Long amount) {
     service.adjustTicketAmount(date, amount);
     return ResponseEntity.ok("Quarter has been edited");
