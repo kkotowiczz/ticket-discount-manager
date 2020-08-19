@@ -3,21 +3,21 @@ package com.github.kkotowiczz.ticketdiscountmanager.salesquarter;
 import java.time.LocalDate;
 
 public class SalesQuarterCreatorDTO {
-  private Long numberOfTickets;
+  private Long amountOfTickets;
   private final LocalDate timestamp = LocalDate.now();
 
-  public SalesQuarterCreatorDTO() {};
+  public SalesQuarterCreatorDTO() {}
 
-  public SalesQuarterCreatorDTO(Long numberOfTickets) {
-    this.numberOfTickets = numberOfTickets;
+  public SalesQuarterCreatorDTO(Long amountOfTickets) {
+    this.amountOfTickets = amountOfTickets;
   }
 
-  public Long getNumberOfTickets() {
-    return numberOfTickets;
+  public Long getAmountOfTickets() {
+    return amountOfTickets;
   }
 
-  public void setNumberOfTickets(Long numberOfTickets) {
-    this.numberOfTickets = numberOfTickets;
+  public void setAmountOfTickets(Long amountOfTickets) {
+    this.amountOfTickets = amountOfTickets;
   }
 
   public LocalDate getTimestamp() {

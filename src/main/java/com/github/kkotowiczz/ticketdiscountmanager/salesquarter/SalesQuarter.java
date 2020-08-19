@@ -15,7 +15,7 @@ public class SalesQuarter {
 
   @Id
   private Long quarterNumber;
-  private Long numberOfTickets;
+  private Long amountOfTickets;
 
   public SalesQuarter() {}
 
@@ -24,15 +24,15 @@ public class SalesQuarter {
     this.quarterNumber = quarterNumber;
   }
 
-  public void setNumberOfTickets(Long numberOfTickets) {
-    this.numberOfTickets = numberOfTickets;
+  public void setAmountOfTickets(Long amountOfTickets) {
+    this.amountOfTickets = amountOfTickets;
   }
 
   public Long getQuarterNumber() {
     return quarterNumber;
   }
 
-  public Long getNumberOfTickets() {
-    return numberOfTickets;
+  public Long getAmountOfTickets() {
+    return amountOfTickets;
   }
 }

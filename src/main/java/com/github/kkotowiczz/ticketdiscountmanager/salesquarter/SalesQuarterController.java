@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 
-@RestController("/discount-tickets")
+@RestController
 public class SalesQuarterController {
   private final SalesQuarterService service;
 

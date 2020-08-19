@@ -2,12 +2,10 @@ package com.github.kkotowiczz.ticketdiscountmanager.salesquarter;
 
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 
 @Service
@@ -21,12 +19,15 @@ public class SalesQuarterService {
   void createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(salesQuarterCreatorDTO.getTimestamp().getMonth().firstMonthOfQuarter().toString());
     var optional = salesQuarterRepository.findById(quarter);
+
     if(optional.isPresent()) {
       throw new RuntimeException("Quarter already exists");
     }
+
+
     var salesQuarter = new SalesQuarter();
     salesQuarter.setQuarterNumber(quarter);
-    salesQuarter.setNumberOfTickets(salesQuarterCreatorDTO.getNumberOfTickets());
+    salesQuarter.setAmountOfTickets(salesQuarterCreatorDTO.getAmountOfTickets() > 0 ? salesQuarterCreatorDTO.getAmountOfTickets() : 0L);
     salesQuarterRepository.save(salesQuarter);
   }
 
@@ -34,10 +35,10 @@ public class SalesQuarterService {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(date.getMonth().firstMonthOfQuarter().toString());
     var numberOfWeeks = countNumberOfWeeks(date);
     var salesQuarter = salesQuarterRepository.findById(quarter);
-    return divideNumberOfTicketsByWeeks(numberOfWeeks, salesQuarter.get().getNumberOfTickets());
+    return divideNumberOfTicketsByWeeks(numberOfWeeks, salesQuarter.get().getAmountOfTickets());
   }
 
-  long countNumberOfWeeks(LocalDate date) {
+  private long countNumberOfWeeks(LocalDate date) {
     var firstMonthOfCurrentQuarter = date.getMonth().firstMonthOfQuarter().getValue();
     var year = date.getYear();
     var firstDayOfQuarter = LocalDate.of(year, firstMonthOfCurrentQuarter, 1);
@@ -73,10 +74,10 @@ public class SalesQuarterService {
     if(quarterOptional.isPresent()) {
       var quarter = quarterOptional.get();
 
-      if(quarter.getNumberOfTickets() + amount > 0) {
-        quarter.setNumberOfTickets(quarter.getNumberOfTickets() + amount);
+      if(quarter.getAmountOfTickets() + amount > 0) {
+        quarter.setAmountOfTickets(quarter.getAmountOfTickets() + amount);
       } else {
-       quarter.setNumberOfTickets(0L);
+       quarter.setAmountOfTickets(0L);
       }
 
       salesQuarterRepository.save(quarter);
