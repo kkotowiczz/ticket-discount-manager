@@ -20,9 +20,9 @@ public class SalesQuarterController {
 
   @PostMapping
   public ResponseEntity<String> createSaleQuarter(@RequestBody SalesQuarterCreatorDTO dto) {
-    var salesQuarter = service.createSalesQuarter(dto);
-    return ResponseEntity.created(URI.create(dto.getTimestamp().toString()))
-      .body(String.format("Sales Quarter %d has been created with total %d of tickets", salesQuarter.getQuarterNumber(), salesQuarter.getAmountOfTickets()));
+    var optional = service.createSalesQuarter(dto);
+    String responseBodyString = optional.isEmpty() ? "has been created" : optional.map(quarter -> quarter.getQuarterNumber() + " already exists").get();
+    return optional.isEmpty() ? ResponseEntity.ok("Sales quarter " + responseBodyString) : ResponseEntity.badRequest().body("Sales quarter " + responseBodyString);
 
   }
 

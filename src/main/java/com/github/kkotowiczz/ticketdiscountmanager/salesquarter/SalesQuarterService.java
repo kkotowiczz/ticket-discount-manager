@@ -18,19 +18,18 @@ public class SalesQuarterService {
     this.salesQuarterRepository = salesQuarterRepository;
   }
 
-  SalesQuarter createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
+  Optional<SalesQuarter> createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(salesQuarterCreatorDTO.getTimestamp().getMonth().firstMonthOfQuarter().toString());
     var optional = salesQuarterRepository.findById(quarter);
 
-    if(optional.isPresent()) {
-      throw new RuntimeException("Quarter already exists");
+    if(optional.isEmpty()) {
+      var salesQuarter = new SalesQuarter();
+      salesQuarter.setQuarterNumber(quarter);
+      salesQuarter.setAmountOfTickets(salesQuarterCreatorDTO.getAmountOfTickets() > 0 ? salesQuarterCreatorDTO.getAmountOfTickets() : 0L);
+      salesQuarterRepository.save(salesQuarter);
     }
 
-    var salesQuarter = new SalesQuarter();
-    salesQuarter.setQuarterNumber(quarter);
-    salesQuarter.setAmountOfTickets(salesQuarterCreatorDTO.getAmountOfTickets() > 0 ? salesQuarterCreatorDTO.getAmountOfTickets() : 0L);
-    salesQuarterRepository.save(salesQuarter);
-    return salesQuarter;
+    return optional;
   }
 
   Map<String, Long> getTicketsByWeek(LocalDate date) {
