@@ -2,10 +2,12 @@ package com.github.kkotowiczz.ticketdiscountmanager.salesquarter;
 
 import org.springframework.stereotype.Service;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 @Service
@@ -16,7 +18,7 @@ public class SalesQuarterService {
     this.salesQuarterRepository = salesQuarterRepository;
   }
 
-  void createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
+  SalesQuarter createSalesQuarter(SalesQuarterCreatorDTO salesQuarterCreatorDTO) {
     var quarter = SalesQuarter.FIRST_MONTH_OF_QUARTER.get(salesQuarterCreatorDTO.getTimestamp().getMonth().firstMonthOfQuarter().toString());
     var optional = salesQuarterRepository.findById(quarter);
 
@@ -24,11 +26,11 @@ public class SalesQuarterService {
       throw new RuntimeException("Quarter already exists");
     }
 
-
     var salesQuarter = new SalesQuarter();
     salesQuarter.setQuarterNumber(quarter);
     salesQuarter.setAmountOfTickets(salesQuarterCreatorDTO.getAmountOfTickets() > 0 ? salesQuarterCreatorDTO.getAmountOfTickets() : 0L);
     salesQuarterRepository.save(salesQuarter);
+    return salesQuarter;
   }
 
   Map<String, Long> getTicketsByWeek(LocalDate date) {
@@ -69,7 +71,7 @@ public class SalesQuarterService {
     return ticketsByWeekNumber;
   }
 
-  void adjustTicketAmount(LocalDate date, Long amount) {
+  Optional<SalesQuarter> adjustTicketAmount(LocalDate date, Long amount) {
     var quarterOptional = salesQuarterRepository.findById(SalesQuarter.FIRST_MONTH_OF_QUARTER.get(date.getMonth().firstMonthOfQuarter().toString()));
     if(quarterOptional.isPresent()) {
       var quarter = quarterOptional.get();
@@ -82,5 +84,6 @@ public class SalesQuarterService {
 
       salesQuarterRepository.save(quarter);
     }
+    return quarterOptional;
   }
 }
